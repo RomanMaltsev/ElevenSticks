@@ -1,0 +1,7 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+TabWidth: 4
+ColumnLimit: 120
+AlignAfterOpenBracket: Align
+AllowShortIfStatementsOnASingleLine: Always
