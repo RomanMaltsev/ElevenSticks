@@ -1,0 +1,17 @@
+name: tests
+
+on: [ push ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v2
+
+      - name: "build"
+        run: cmake -S . -B build && cmake --build build
+
+      - name: "tests"
+        run: ./build/bin/eleven_sticks_tests
