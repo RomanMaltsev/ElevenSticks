@@ -1,0 +1,14 @@
+name: clang-tidy
+
+on: [ push ]
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v2
+
+      - name: "clang-tidy"
+        run: clang-tidy $(find . -name '*.cpp') -- -I./include -Wall -Wextra --pedantic -Werror
