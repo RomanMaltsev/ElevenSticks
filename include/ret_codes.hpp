@@ -1,0 +1,12 @@
+#ifndef ELEVEN_STICKS_RET_CODES
+#define ELEVEN_STICKS_RET_CODES 1
+
+enum class RetCodes {
+    SUCCESS = 0,
+    ERR_INVALID_ARGS = 1,
+    ERR_CONNECTION_FAILED = 2,
+    ERR_TIMEOUT = 3,
+    ERR_NOT_SUPPORTED = 4,
+    ERR_UNKNOWN = 255
+};
+#endif
