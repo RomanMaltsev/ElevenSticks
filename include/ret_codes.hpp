@@ -7,6 +7,7 @@ enum class RetCodes {
     ERR_CONNECTION_FAILED = 2,
     ERR_TIMEOUT = 3,
     ERR_NOT_SUPPORTED = 4,
+    ERR_INTERNAL = 5,
     ERR_UNKNOWN = 255
 };
 #endif
