@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-RetCodes open_server(int *player, int *server_fd, sockaddr_in *addr) {
+RetCodes open_server(int *player, sockaddr_in *addr) {
     int server_fd_value = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd_value < 0) {
         perror("socket() failed");
@@ -65,7 +65,7 @@ RetCodes server(Rules game_rules = Rules()) {
     int player[2];
     int server_fd;
     sockaddr_in addr{};
-    RetCodes ret = open_server(player, &server_fd, &addr);
+    RetCodes ret = open_server(player, &addr);
     if (ret != RetCodes::SUCCESS) {
         return ret;
     }
