@@ -5,13 +5,17 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
-RetCodes open_server(int *player, sockaddr_in *addr) {
+#define PLAYER_COUNT 2
+
+RetCodes open_server(int *player, int *server_fd, sockaddr_in *addr) {
     int server_fd_value = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd_value < 0) {
         perror("socket() failed");
         return RetCodes::ERR_INTERNAL;
     }
+    *server_fd = server_fd_value;
     addr->sin_family = AF_INET;
     addr->sin_port = htons(8080);
     addr->sin_addr.s_addr = INADDR_ANY;
@@ -21,7 +25,7 @@ RetCodes open_server(int *player, sockaddr_in *addr) {
         return RetCodes::ERR_INTERNAL;
     }
     listen(server_fd_value, SOMAXCONN);
-    for (size_t i = 0; i < 2; ++i) {
+    for (size_t i = 0; i < PLAYER_COUNT; ++i) {
         std::cout << "Waiting for player " << (i + 1) << " to connect...\n";
         int client_fd = accept(server_fd_value, nullptr, nullptr);
         if (client_fd < 0) {
@@ -57,23 +61,37 @@ RetCodes game(Rules game_rules, int *player) {
     return RetCodes::SUCCESS;
 }
 
+void cleanup(int *player, const int *server_fd) {
+    for (size_t i = 0; i < PLAYER_COUNT; ++i) {
+        if (player[i] != -1) {
+            close(player[i]);
+        }
+    }
+    if (server_fd != nullptr) {
+        close(*server_fd);
+    }
+}
+
 RetCodes server(Rules game_rules = Rules()) {
-    if (game_rules.players != 2) {
-        std::cerr << "Error: Only 2 players are supported in this version.\n";
+    if (game_rules.players != PLAYER_COUNT) {
+        std::cerr << "Error: Only " << PLAYER_COUNT << " players are supported in this version.\n";
         return RetCodes::ERR_NOT_SUPPORTED;
     }
-    int player[2];
-    int server_fd;
+    int player[PLAYER_COUNT];
+    int *server_fd = nullptr;
     sockaddr_in addr{};
-    RetCodes ret = open_server(player, &addr);
+    RetCodes ret = open_server(player, server_fd, &addr);
     if (ret != RetCodes::SUCCESS) {
+        cleanup(player, server_fd);
         return ret;
     }
 
     ret = game(game_rules, player);
     if (ret != RetCodes::SUCCESS) {
+        cleanup(player, server_fd);
         return ret;
     }
 
+    cleanup(player, server_fd);
     return RetCodes::SUCCESS;
 }
