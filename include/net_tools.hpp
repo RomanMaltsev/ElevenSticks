@@ -1,13 +1,7 @@
-#ifndef _SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-
-#ifndef _UNISTD_H
-#include <sys/unistd.h>
-#endif
-
 #ifndef ELEVEN_STICKS_NET_TOOLS_HPP
 #define ELEVEN_STICKS_NET_TOOLS_HPP
+#include <sys/socket.h>
+#include <sys/unistd.h>
 
 bool send_all(int fd, const void *buf, size_t len) {
     const char *p = (const char *)buf;

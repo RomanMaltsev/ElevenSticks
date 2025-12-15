@@ -1,5 +1,5 @@
-#ifndef ELEVEN_STICKS_RULES
-#define ELEVEN_STICKS_RULES 1
+#ifndef ELEVEN_STICKS_RULES_HPP
+#define ELEVEN_STICKS_RULES_HPP
 #include <cstddef>
 
 struct Rules {
