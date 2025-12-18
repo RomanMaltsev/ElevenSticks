@@ -8,6 +8,7 @@
 #include <cstring>
 #include <iostream>
 #include <optional>
+#include <sstream>
 
 struct PlayerSetup {
     bool host_server = false;
@@ -103,14 +104,17 @@ int main() {
         if (pid == 0) {
             std::cout << "Server successfully started. "
                       << "port: " << SERVER_PORT << ".\n";
-            return static_cast<int>(server(game_rules));
+            Server server(game_rules);
+            return static_cast<int>(server.run());
         }
 
-        log_rules("client", game_rules);
-        return static_cast<int>(client(game_rules));
+        std::cout << "Starting client...";
+        Client client;
+        return static_cast<int>(client.run());
     } else {
-        log_rules("client", game_rules);
-        return static_cast<int>(client(game_rules));
+        std::cout << "Starting client...";
+        Client client;
+        return static_cast<int>(client.run());
     }
 
     return 0;
