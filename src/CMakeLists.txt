@@ -18,6 +18,7 @@ target_include_directories(${PROJECT_NAME}
 
 add_executable(${PROJECT_NAME}_run
     main.cpp
+    logger.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_run
