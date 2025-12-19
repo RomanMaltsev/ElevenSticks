@@ -1,4 +1,6 @@
 #include "logger.hpp"
+#include <chrono>
+#include <iomanip>
 
 Logger::Logger(std::ostream &out) : out_(out) {}
 

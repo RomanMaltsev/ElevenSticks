@@ -1,8 +1,6 @@
 #ifndef ELEVEN_STICKS_NET_TOOLS_HPP
 #define ELEVEN_STICKS_NET_TOOLS_HPP
 #include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/unistd.h>
 
 inline bool send_all(int fd, const void *buf, size_t len) {
     const char *p = (const char *)buf;

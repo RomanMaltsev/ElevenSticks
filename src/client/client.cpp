@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "message_classes.hpp"
 
 #include <arpa/inet.h>
 #include <iostream>

@@ -1,4 +1,6 @@
 #include "server.hpp"
+#include "message_classes.hpp"
+#include <sys/unistd.h>
 
 RetCodes Server::open_server() {
     if (listen(server_fd, SOMAXCONN) < 0) {

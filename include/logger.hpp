@@ -1,8 +1,6 @@
 #ifndef ELEVEN_STICKS_LOGGER_HPP
 #define ELEVEN_STICKS_LOGGER_HPP
 
-#include <chrono>
-#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
