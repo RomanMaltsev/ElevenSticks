@@ -2,7 +2,7 @@
 #define ELEVEN_STICKS_NET_TOOLS_HPP
 #include <netinet/in.h>
 
-inline bool send_all(int fd, const void *buf, size_t len) {
+bool send_all(int fd, const void *buf, size_t len) {
     const char *p = (const char *)buf;
     while (len > 0) {
         ssize_t sent = send(fd, p, len, 0);
@@ -12,7 +12,7 @@ inline bool send_all(int fd, const void *buf, size_t len) {
     }
     return true;
 }
-inline bool recv_all(int fd, void *buf, size_t len) {
+bool recv_all(int fd, void *buf, size_t len) {
     char *p = (char *)buf;
     while (len > 0) {
         ssize_t recvd = recv(fd, p, len, 0);
