@@ -79,10 +79,11 @@ std::optional<PlayerSetup> ask_player() {
 }
 
 void log_rules(const std::string &who, const Rules &rules) {
-    std::cout << "Starting " << who << " with rules: " << rules.count << " sticks, "
-              << "max take: " << rules.max_take << ", "
-              << "min take: " << rules.min_take << ", "
-              << "players: " << rules.players << ".\n";
+    std::cout << "Starting " << who << " with rules: ";
+    std::cout << "start sticks: " << rules.count << ", ";
+    std::cout << "max take: " << rules.max_take << ", ";
+    std::cout << "min take: " << rules.min_take << ", ";
+    std::cout << "players: " << rules.players << ".\n";
 }
 
 int main() {
