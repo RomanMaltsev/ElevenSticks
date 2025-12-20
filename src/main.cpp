@@ -106,8 +106,8 @@ int main() {
         }
 
         if (pid == 0) {
-            std::cout << "Server successfully started. "
-                      << "port: " << SERVER_PORT << ".\n";
+            std::cout << "Server successfully started. ";
+            std::cout << "Port: " << SERVER_PORT << ".\n";
             Server server(game_rules);
             rc = static_cast<int>(server.run());
             goto end;
