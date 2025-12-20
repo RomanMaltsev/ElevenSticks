@@ -8,7 +8,8 @@ enum class RetCodes {
     ERR_TIMEOUT = 3,
     ERR_NOT_SUPPORTED = 4,
     ERR_INTERNAL = 5,
-    ABORTED = 6,
+    ERR_PROTOCOL = 6,
+    ABORTED = 7,
     ERR_UNKNOWN = 255
 };
 #endif
