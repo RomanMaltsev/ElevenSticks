@@ -8,7 +8,6 @@
 #include <fstream>
 
 #define PLAYER_COUNT 2
-#define TIMEOUT 5
 
 #define SERVER_PORT 8080
 
@@ -16,11 +15,11 @@ class Server {
   public:
     explicit Server(Rules rules = Rules(), std::string_view file = "log.txt", uint32_t player_count = PLAYER_COUNT);
     ~Server();
-    RetCodes run();
+    [[nodiscard]] RetCodes run();
 
   private:
-    RetCodes game();
-    RetCodes open_server();
+    [[nodiscard]] RetCodes game();
+    [[nodiscard]] RetCodes open_server();
     sockaddr_in addr{};
     Rules game_rules;
     std::ofstream log_file;

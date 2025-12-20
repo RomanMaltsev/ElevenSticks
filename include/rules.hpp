@@ -2,6 +2,8 @@
 #define ELEVEN_STICKS_RULES_HPP
 #include <cstddef>
 
+#define TIMEOUT 60
+
 struct Rules {
     size_t count;
     size_t max_take;

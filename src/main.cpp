@@ -9,6 +9,7 @@
 #include <iostream>
 #include <optional>
 #include <sstream>
+#include <sys/wait.h>
 
 struct PlayerSetup {
     bool host_server = false;
@@ -86,10 +87,11 @@ void log_rules(const std::string &who, const Rules &rules) {
 
 int main() {
     Rules game_rules;
+    int rc = 0;
     bool run_server = false;
     std::cout << "Welcome to Eleven Sticks!" << std::endl
               << "This is a simple game where several players take turns removing by "
-                 "default 1 to 3 sticks from a pile of 11. The player who takes the last stick loses!"
+                 "default 1 to 3 sticks from a pile of 11. The player who takes the last stick wins!"
               << std::endl;
     auto setup = ask_player();
     if (setup->host_server) {
@@ -98,24 +100,27 @@ int main() {
         pid_t pid = fork();
         if (pid < 0) {
             std::cerr << "Server fork failed: " << strerror(errno) << "\n";
-            return static_cast<int>(RetCodes::ERR_INTERNAL);
+            rc = static_cast<int>(RetCodes::ERR_INTERNAL);
+            goto end;
         }
 
         if (pid == 0) {
             std::cout << "Server successfully started. "
                       << "port: " << SERVER_PORT << ".\n";
             Server server(game_rules);
-            return static_cast<int>(server.run());
+            rc = static_cast<int>(server.run());
+            goto end;
         }
-
-        std::cout << "Starting client...";
+        sleep(1);
+        std::cout << "Starting client...\n";
         Client client;
-        return static_cast<int>(client.run());
+        rc = static_cast<int>(client.run());
     } else {
-        std::cout << "Starting client...";
+        std::cout << "Starting client...\n";
         Client client;
-        return static_cast<int>(client.run());
+        rc = static_cast<int>(client.run());
     }
-
-    return 0;
+    wait(nullptr);
+end:
+    return rc;
 }

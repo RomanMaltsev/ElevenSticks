@@ -10,6 +10,10 @@ class Client {
     RetCodes run();
 
   private:
+    [[nodiscard]] RetCodes reachServer();
+    [[nodiscard]] RetCodes acceptRules();
+    void askSticks(uint32_t &take, uint32_t sticks) const;
+    [[nodiscard]] RetCodes gameLoop() const;
     sockaddr_in addr{};
     Rules game_rules;
     int server_fd;

@@ -2,7 +2,7 @@
 #include "message_classes.hpp"
 #include <sys/unistd.h>
 
-RetCodes Server::open_server() {
+[[nodiscard]] RetCodes Server::open_server() {
     if (listen(server_fd, SOMAXCONN) < 0) {
         logger.error("listen() failed");
         return RetCodes::ERR_INTERNAL;
@@ -34,18 +34,12 @@ RetCodes Server::open_server() {
             logger.error("accept() failed");
             return RetCodes::ERR_CONNECTION_FAILED;
         }
+        setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
         player[i] = client_fd;
         MessageClasses msg_class = MessageClasses::INFO;
-        uint32_t msg_class_net = htonl((uint32_t)msg_class);
-        ssize_t bytes_sent = send_all(player[i], &msg_class_net, sizeof(msg_class_net));
-        if (bytes_sent <= 0) {
-            logger.error("Error: Failed to send data to player " + std::to_string(i + 1) + ".");
-            return RetCodes::ERR_CONNECTION_FAILED;
-        }
-        bytes_sent = send_all(player[i], &game_rules, sizeof(game_rules));
-        if (bytes_sent <= 0) {
-            logger.error("Error: Failed to send data to player " + std::to_string(i + 1) + ".");
+        if (!send_msg(player[i], msg_class, &game_rules, sizeof(game_rules))) {
+            logger.error("Error: Failed to send game rules to player " + std::to_string(i + 1) + ".");
             return RetCodes::ERR_CONNECTION_FAILED;
         }
         logger.info("Player " + std::to_string(i + 1) + " connected.");
@@ -54,57 +48,40 @@ RetCodes Server::open_server() {
     return RetCodes::SUCCESS;
 }
 
-RetCodes Server::game() {
+[[nodiscard]] RetCodes Server::game() {
     uint32_t sticks_left = game_rules.count;
     uint32_t turn = 0;
-    while (sticks_left > 0) {
+    while (sticks_left >= game_rules.min_take && sticks_left <= game_rules.count) {
         uint32_t current_player = turn % player_count;
-        uint32_t net_sticks = htonl(sticks_left);
         MessageClasses msg_class = MessageClasses::GAME_UPDATE;
-        uint32_t msg_class_net = htonl((uint32_t)msg_class);
         for (size_t i = 0; i < player_count; ++i) {
-            ssize_t bytes_sent = send_all(player[i], &msg_class_net, sizeof(msg_class_net));
-            if (bytes_sent <= 0) {
-                logger.error("Error: Failed to send data to player " + std::to_string(current_player + 1) + ".");
-                return RetCodes::ERR_CONNECTION_FAILED;
+            if (!send_msg(player[i], msg_class, &sticks_left, sizeof(sticks_left))) {
+                logger.error("Error: Failed to send game update to player " + std::to_string(i + 1) + ".");
             }
-            bytes_sent = send_all(player[i], &net_sticks, sizeof(net_sticks));
-            if (bytes_sent <= 0) {
-                logger.error("Error: Failed to send data to player " + std::to_string(current_player + 1) + ".");
-                return RetCodes::ERR_CONNECTION_FAILED;
-            }
+            logger.info("Sent game update to player " + std::to_string(i + 1) + ": " + std::to_string(sticks_left) +
+                        " sticks left.");
         }
-
-        ssize_t bytes_received = recv_all(player[current_player], &msg_class_net, sizeof(msg_class_net));
-        if (bytes_received <= 0 || ntohl(msg_class_net) != (uint32_t)MessageClasses::PLAYER_ACTION) {
-            logger.error("Error: Invalid move by player " + std::to_string(current_player + 1) + ".");
-            return RetCodes::ERR_INVALID_ARGS;
-        }
+        msg_class = MessageClasses::PLAYER_ACTION;
+        send_msg(player[current_player], msg_class, nullptr, 0);
         uint32_t taken = 0;
-        bytes_received = recv_all(player[current_player], &taken, sizeof(taken));
-        if (bytes_received <= 0 || ntohl(taken) < game_rules.min_take || ntohl(taken) > game_rules.max_take ||
-            ntohl(taken) > sticks_left) {
-            logger.error("Error: Invalid move by player " + std::to_string(current_player + 1) + ".");
-            return RetCodes::ERR_INVALID_ARGS;
-        }
-        taken = ntohl(taken);
+        size_t payload_size = 0;
+        recv_msg(player[current_player], msg_class, &taken, sizeof(taken), payload_size);
         sticks_left -= taken;
         logger.info("Player " + std::to_string(current_player + 1) + " took " + std::to_string(taken) + " sticks. " +
                     std::to_string(sticks_left) + " left.");
         turn++;
     }
-    uint32_t winner = (turn - 1) % player_count;
-    uint32_t net_result = htonl((uint32_t)MessageClasses::GAME_RESULT);
-    uint32_t winner_net = htonl(winner + 1);
-    logger.info("Player " + std::to_string(winner + 1) + " wins!");
+    uint32_t winner = ((turn - 1) % player_count) + 1;
+    logger.info("Player " + std::to_string(winner) + " wins!");
     for (uint32_t i = 0; i < player_count; ++i) {
-        send_all(player[i], &net_result, sizeof(net_result));
-        send_all(player[i], &winner_net, sizeof(winner_net));
+        if (!send_msg(player[i], MessageClasses::GAME_RESULT, &winner, sizeof(winner))) {
+            logger.error("Error: Failed to send game result to player " + std::to_string(i + 1) + ".");
+        }
     }
     return RetCodes::SUCCESS;
 }
 
-RetCodes Server::run() {
+[[nodiscard]] RetCodes Server::run() {
     RetCodes ret = open_server();
     if (ret != RetCodes::SUCCESS) {
         return ret;
