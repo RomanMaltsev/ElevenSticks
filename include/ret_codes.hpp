@@ -1,0 +1,15 @@
+#ifndef ELEVEN_STICKS_RET_CODES_HPP
+#define ELEVEN_STICKS_RET_CODES_HPP
+
+enum class RetCodes {
+    SUCCESS = 0,
+    ERR_INVALID_ARGS = 1,
+    ERR_CONNECTION_FAILED = 2,
+    ERR_TIMEOUT = 3,
+    ERR_NOT_SUPPORTED = 4,
+    ERR_INTERNAL = 5,
+    ERR_PROTOCOL = 6,
+    ABORTED = 7,
+    ERR_UNKNOWN = 255
+};
+#endif
