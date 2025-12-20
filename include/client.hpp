@@ -16,7 +16,6 @@ class Client {
     [[nodiscard]] RetCodes gameLoop() const;
     sockaddr_in addr{};
     Rules game_rules;
-    int server_fd;
     int fd;
 };
 

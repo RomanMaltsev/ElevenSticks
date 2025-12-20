@@ -89,7 +89,6 @@ void log_rules(const std::string &who, const Rules &rules) {
 int main() {
     Rules game_rules;
     int rc = 0;
-    bool run_server = false;
     std::cout << "Welcome to Eleven Sticks!" << std::endl
               << "This is a simple game where several players take turns removing by "
                  "default 1 to 3 sticks from a pile of 11. The player who takes the last stick wins!"

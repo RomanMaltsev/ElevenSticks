@@ -6,7 +6,7 @@
 #include <bits/stdc++.h>
 #include <iostream>
 
-Client::Client() : fd(socket(AF_INET, SOCK_STREAM, 0)), server_fd(-1), addr{}, game_rules(Rules()) {
+Client::Client() : addr{}, fd(socket(AF_INET, SOCK_STREAM, 0)), game_rules(Rules()) {
     if (fd < 0) {
         perror("socket() failed");
         throw std::runtime_error("socket() failed");

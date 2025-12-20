@@ -95,8 +95,8 @@
 }
 
 Server::Server(Rules rules, std::string_view file, uint32_t player_count)
-    : game_rules(rules), log_file(file.data(), std::ios::out | std::ios::app), logger(log_file), player{-1, -1},
-      server_fd(socket(AF_INET, SOCK_STREAM, 0)), player_count(player_count) {
+    : game_rules(rules), log_file(file.data(), std::ios::out | std::ios::app), logger(log_file),
+      server_fd(socket(AF_INET, SOCK_STREAM, 0)), player_count(player_count), player{-1, -1} {
     if (!log_file.is_open()) {
         throw std::runtime_error("Cannot open log file");
     }
@@ -119,11 +119,9 @@ Server::Server(Rules rules, std::string_view file, uint32_t player_count)
 }
 
 Server::~Server() {
-    if (player != nullptr) {
-        for (uint32_t i = 0; i < player_count; ++i) {
-            if (player[i] != -1) {
-                close(player[i]);
-            }
+    for (uint32_t i = 0; i < player_count; ++i) {
+        if (player[i] != -1) {
+            close(player[i]);
         }
     }
     if (server_fd != -1) {
